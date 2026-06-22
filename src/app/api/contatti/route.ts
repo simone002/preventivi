@@ -8,8 +8,8 @@ export async function POST(req: NextRequest) {
     const resend = new Resend(process.env.RESEND_API_KEY);
 
     await resend.emails.send({
-      from: "SerraStyle Contatti <contatti@serrastyle.it>",
-      to: ["info@serrastyle.it"], // ← CAMBIA CON LA TUA EMAIL REALE
+      from: "SerraStyle Contatti <onboarding@resend.dev>",
+      to: ["simonebattiato002@gmail.com"], // ← CAMBIA CON LA TUA EMAIL REALE
       replyTo: email,
       subject: `Messaggio dal sito: ${oggetto}`,
       html: `
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     });
 
     await resend.emails.send({
-      from: "SerraStyle <info@serrastyle.it>",
+      from: "SerraStyle <onboarding@resend.dev>",
       to: [email],
       subject: "Abbiamo ricevuto il tuo messaggio – SerraStyle",
       html: `

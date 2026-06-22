@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
 
     // Email all'azienda
     await resend.emails.send({
-      from: "SerraStyle Preventivi <preventivi@serrastyle.it>",
+      from: "SerraStyle Preventivi <onboarding@resend.dev>",
       to: ["simonebattiato002@gmail.com"], // ← CAMBIA CON LA TUA EMAIL REALE
       replyTo: email,
       subject: `Nuova richiesta preventivo – ${nome} ${cognome}`,
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
 
     // Conferma al cliente
     await resend.emails.send({
-      from: "SerraStyle <info@serrastyle.it>",
+      from: "SerraStyle <onboarding@resend.dev>",
       to: [email],
       subject: "Abbiamo ricevuto la tua richiesta – SerraStyle",
       html: `
