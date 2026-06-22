@@ -1,18 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getTransporter, FROM, COMPANY_EMAIL } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { nome, cognome, email, telefono, tipoIntervento, materiale, indirizzo, citta, note } = body;
 
-    // Lazy import so build doesn't fail without API key
-    const { Resend } = await import("resend");
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    const transporter = getTransporter();
 
-    // Email all'azienda
-    await resend.emails.send({
-      from: "SerraStyle Preventivi <onboarding@resend.dev>",
-      to: ["simonebattiato002@gmail.com"], // ← CAMBIA CON LA TUA EMAIL REALE
+    // Email all'azienda (notifica del nuovo lead). Bloccante: se fallisce, è un vero errore.
+    await transporter.sendMail({
+      from: FROM,
+      to: COMPANY_EMAIL,
       replyTo: email,
       subject: `Nuova richiesta preventivo – ${nome} ${cognome}`,
       html: `
@@ -43,10 +42,11 @@ export async function POST(req: NextRequest) {
       `,
     });
 
-    // Conferma al cliente
-    await resend.emails.send({
-      from: "SerraStyle <onboarding@resend.dev>",
-      to: [email],
+    // Conferma al cliente. Non bloccante: se fallisce, il lead è comunque arrivato all'azienda.
+    try {
+      await transporter.sendMail({
+      from: FROM,
+      to: email,
       subject: "Abbiamo ricevuto la tua richiesta – SerraStyle",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -70,7 +70,10 @@ export async function POST(req: NextRequest) {
           </div>
         </div>
       `,
-    });
+      });
+    } catch (confirmError) {
+      console.error("Confirmation email error (non-blocking):", confirmError);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
